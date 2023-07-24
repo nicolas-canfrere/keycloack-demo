@@ -1,10 +1,25 @@
-# Keycloack
+# Keycloack Demo !!! POC !!!
 
-## Discovering authorization services endpoints and metadata
+## Installation...
 
-curl -X GET http://${host}:${port}/realms/${realm}/.well-known/uma2-configuration
+Construire l'image PHP utilisée dans le docker-compose.yaml (! image non optimisée !)
 
-curl -X GET http://127.0.0.1:9090/realms/demo/.well-known/uma2-configuration
+```shell
+cd php-dev-8.2.6
+docker build . -t php-dev:8.2.6
+```
+Ou utilisez votre propre image PHP (8.2) : modifier le docker-compose.yaml 
 
+Lancer les applications avec Docker Compose (la mise en route est relativement longue + de 30 secondes)
 
-http://127.0.0.1:9090/realms/demo/protocol/openid-connect/token
+```shell
+# à la racine du projet
+make up
+```
+
+Pour tout arrêter
+
+```shell
+# à la racine du projet
+make down
+```
