@@ -1,0 +1,16 @@
+/client/.idea
+/client/.env.local
+/client/.env.local.php
+/client/.env.*.local
+/client/config/secrets/prod/prod.decrypt.private.php
+/client/public/bundles/
+/client/var/
+/client/vendor/
+/resource/.idea
+/resource/.env.local
+/resource/.env.local.php
+/resource/.env.*.local
+/resource/config/secrets/prod/prod.decrypt.private.php
+/resource/public/bundles/
+/resource/var/
+/resource/vendor/

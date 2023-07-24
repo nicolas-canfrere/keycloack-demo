@@ -1,0 +1,85 @@
+services:
+  keycloack-demo:
+    image: quay.io/keycloak/keycloak:22.0.1
+    networks:
+      - keycloack_demo_network
+    command: start-dev
+    environment:
+      KC_DB: postgres
+      KC_DB_URL: jdbc:postgresql://keycloack_demo_postgres/postgres
+      KC_DB_USERNAME: kcuser
+      KC_DB_PASSWORD: kcpassword
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: admin
+      KC_HOSTNAME: keycloack-demo
+    ports:
+      - "9090:8080"
+    depends_on:
+      keycloack_demo_postgres:
+        condition: service_healthy
+
+  keycloack_demo_postgres:
+    image: postgres:15-alpine3.18
+    networks:
+      - keycloack_demo_network
+    ports:
+      - "5433:5432"
+    environment:
+      POSTGRES_USER: kcuser
+      POSTGRES_PASSWORD: kcpassword
+    volumes:
+      - keycloack_demo_database:/var/lib/postgresql/data:rw
+    healthcheck:
+      test: "exit 0"
+
+  keycloack_demo_client_app:
+    image: php-dev:8.2.6
+    networks:
+      - keycloack_demo_network
+    volumes:
+      - ./client:/client
+    working_dir: /client
+    depends_on:
+      - keycloack-demo
+
+  keycloack_demo_client_server:
+    image: nginx:1.25-alpine3.17
+    networks:
+      - keycloack_demo_network
+    volumes:
+      - ./client/docker/nginx/conf.d:/etc/nginx/conf.d:ro
+      - ./client:/client
+    ports:
+      - "8001:80"
+    working_dir: /client
+    depends_on:
+      - keycloack-demo
+
+  keycloack_demo_resource_app:
+    image: php-dev:8.2.6
+    networks:
+      - keycloack_demo_network
+    volumes:
+      - ./resource:/resource
+    working_dir: /resource
+    depends_on:
+      - keycloack-demo
+
+  keycloack_demo_resource_server:
+    image: nginx:1.25-alpine3.17
+    networks:
+      - keycloack_demo_network
+    volumes:
+      - ./resource/docker/nginx/conf.d:/etc/nginx/conf.d:ro
+      - ./resource:/resource
+    ports:
+      - "8002:80"
+    working_dir: /resource
+    depends_on:
+      - keycloack-demo
+
+networks:
+  keycloack_demo_network:
+    driver: bridge
+volumes:
+  keycloack_demo_database:

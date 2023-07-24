@@ -1,0 +1,13 @@
+security:
+    firewalls:
+        dev:
+            pattern: ^/(_(profiler|wdt)|css|images|js)/
+            security: false
+        api:
+            pattern: ^/api
+            stateless: true
+            custom_authenticators:
+                - App\Security\JWTAuthenticator
+
+    access_control:
+        - { path: ^/api, roles: ROLE_CLIENT }
