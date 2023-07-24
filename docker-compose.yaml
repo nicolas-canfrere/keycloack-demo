@@ -11,7 +11,7 @@ services:
       KC_DB_PASSWORD: kcpassword
       KEYCLOAK_ADMIN: admin
       KEYCLOAK_ADMIN_PASSWORD: admin
-      KC_HOSTNAME: keycloack-demo
+      # KC_HOSTNAME: keycloack-demo ## pb avec les urls des enpoints ...
     ports:
       - "9090:8080"
     depends_on:

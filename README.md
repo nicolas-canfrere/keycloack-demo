@@ -10,6 +10,13 @@ docker build . -t php-dev:8.2.6
 ```
 Ou utilisez votre propre image PHP (8.2) : modifier le docker-compose.yaml 
 
+Installer les vendors des app avec php-dev:8.2.6
+
+```shell
+make install_client
+make install_resource
+```
+
 Lancer les applications avec Docker Compose (la mise en route est relativement longue + de 30 secondes)
 
 ```shell
@@ -23,3 +30,16 @@ Pour tout arrêter
 # à la racine du projet
 make down
 ```
+
+## Accès à Keycloack
+
+![welcome keycloack](./img/keycloack_welcome.jpg)
+
+Dans un navigateur, aller sur http://127.0.0.1:9090
+
+Cliquer sur "Administration Console"
+
+![keycloack login](./img/keycloack_login.jpg)
+
+- Username : admin
+- Password : admin
