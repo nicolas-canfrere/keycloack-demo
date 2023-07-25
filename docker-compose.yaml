@@ -1,8 +1,28 @@
 services:
+
+  keycloack_proxy:
+    image: traefik:${TRAEFIK_VERSION:-2.6}
+    ports:
+      - "80:80"
+    networks:
+      keycloack_demo_network:
+        aliases:
+          - "keycloack-proxy"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.api.rule=Host(`keycloack-proxy`)"
+      - "traefik.http.routers.api.service=api@internal"
+      - "traefik.http.routers.api.entrypoints=http"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./traefik/traefik.yml:/etc/traefik/traefik.yml:ro
+
   keycloack-demo:
     image: quay.io/keycloak/keycloak:22.0.1
     networks:
-      - keycloack_demo_network
+      keycloack_demo_network:
+        aliases:
+          - "keycloack-demo"
     command: start-dev
     environment:
       KC_DB: postgres
@@ -11,12 +31,17 @@ services:
       KC_DB_PASSWORD: kcpassword
       KEYCLOAK_ADMIN: admin
       KEYCLOAK_ADMIN_PASSWORD: admin
-      # KC_HOSTNAME: keycloack-demo ## pb avec les urls des enpoints ...
-    ports:
-      - "9090:8080"
+      KC_HOSTNAME: "keycloack-demo"
+    #ports:
+      #- "9090:8080"
     depends_on:
       keycloack_demo_postgres:
         condition: service_healthy
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.keycloack-demo.entrypoints=http"
+      - "traefik.http.routers.keycloack-demo.rule=Host(`keycloack-demo`)"
+      - "traefik.http.services.keycloack-demo.loadbalancer.server.port=8080"
 
   keycloack_demo_postgres:
     image: postgres:15-alpine3.18
@@ -31,6 +56,8 @@ services:
       - keycloack_demo_database:/var/lib/postgresql/data:rw
     healthcheck:
       test: "exit 0"
+    labels:
+      - "traefik.enable=false"
 
   keycloack_demo_client_app:
     image: php-dev:8.2.6
@@ -41,19 +68,27 @@ services:
     working_dir: /client
     depends_on:
       - keycloack-demo
+    labels:
+      - "traefik.enable=false"
 
   keycloack_demo_client_server:
     image: nginx:1.25-alpine3.17
     networks:
-      - keycloack_demo_network
+      keycloack_demo_network:
+        aliases:
+          - "demo-client"
     volumes:
       - ./client/docker/nginx/conf.d:/etc/nginx/conf.d:ro
       - ./client:/client
-    ports:
-      - "8001:80"
+    #ports:
+      #- "8001:80"
     working_dir: /client
     depends_on:
       - keycloack-demo
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.keycloack_demo_client_server.entrypoints=http"
+      - "traefik.http.routers.keycloack_demo_client_server.rule=Host(`demo-client`)"
 
   keycloack_demo_resource_app:
     image: php-dev:8.2.6
@@ -64,19 +99,27 @@ services:
     working_dir: /resource
     depends_on:
       - keycloack-demo
+    labels:
+      - "traefik.enable=false"
 
   keycloack_demo_resource_server:
     image: nginx:1.25-alpine3.17
     networks:
-      - keycloack_demo_network
+      keycloack_demo_network:
+        aliases:
+          - "demo-resource"
     volumes:
       - ./resource/docker/nginx/conf.d:/etc/nginx/conf.d:ro
       - ./resource:/resource
-    ports:
-      - "8002:80"
+    #ports:
+      #- "8002:80"
     working_dir: /resource
     depends_on:
       - keycloack-demo
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.keycloack_demo_resource_server.entrypoints=http"
+      - "traefik.http.routers.keycloack_demo_resource_server.rule=Host(`demo-resource`)"
 
 networks:
   keycloack_demo_network:

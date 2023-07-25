@@ -17,6 +17,14 @@ make install_client
 make install_resource
 ```
 
+Ajouter à /etc/hosts
+
+```text
+127.0.0.1 keycloack-demo
+127.0.0.1 demo-client
+127.0.0.1 demo-resource
+```
+
 Lancer les applications avec Docker Compose (la mise en route est relativement longue + de 30 secondes)
 
 ```shell
@@ -35,7 +43,7 @@ make down
 
 ![welcome keycloack](./img/keycloack_welcome.jpg)
 
-Dans un navigateur, aller sur http://127.0.0.1:9090
+Dans un navigateur, aller sur http://keycloack-demo
 
 Cliquer sur "Administration Console"
 
